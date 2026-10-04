@@ -1,5 +1,6 @@
 import express from 'express';
 import authRoutes from './routes/authRoutes';
+import clientRoutes from './routes/clientRoutes';
 
 const app = express();
 app.use(express.json());
@@ -12,6 +13,9 @@ app.get('/test', (req, res) => {
 // Auth routes
 app.use('/auth', authRoutes);
 
+// Client routes
+app.use('/clients', clientRoutes);
+
 // Root route
 app.get('/', (req, res) => {
   res.send('RelayWorks API is running');
@@ -21,4 +25,3 @@ const PORT = 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-Fix app initialization order in index.ts
