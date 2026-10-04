@@ -1,3 +1,4 @@
+import workerRoutes from './routes/workerRoutes';
 import express from 'express';
 import authRoutes from './routes/authRoutes';
 import clientRoutes from './routes/clientRoutes';
@@ -15,7 +16,7 @@ app.use('/auth', authRoutes);
 
 // Client routes
 app.use('/clients', clientRoutes);
-
+app.use('/workers', workerRoutes);
 // Root route
 app.get('/', (req, res) => {
   res.send('RelayWorks API is running');
@@ -26,3 +27,4 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 Fix app initialization order and connect client routes correctly
+Connect worker routes to server
