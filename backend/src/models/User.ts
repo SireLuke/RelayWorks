@@ -8,3 +8,4 @@ export interface User {
   linkedClientId?: string;
   linkedWorkerId?: string;
 }
+Add User model
