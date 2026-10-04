@@ -24,3 +24,4 @@ export class AuthService {
     );
   }
 }
+Add AuthService for password hashing and JWT generation
