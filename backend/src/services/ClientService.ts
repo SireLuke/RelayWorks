@@ -32,3 +32,4 @@ export class ClientService {
     return client;
   }
 }
+Add ClientService with basic in-memory client logic
