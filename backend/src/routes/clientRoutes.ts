@@ -2,14 +2,17 @@ import { Router } from 'express';
 
 const router = Router();
 
-// Placeholder routes
-router.get('/', (req, res) => {
-  res.json({ message: 'List all clients (placeholder)' });
-});
+import { Router } from 'express';
+import { ClientController } from '../controllers/ClientController';
 
-router.post('/', (req, res) => {
-  res.json({ message: 'Create a new client (placeholder)' });
-});
+const router = Router();
+
+router.get('/', ClientController.list);
+router.post('/', ClientController.create);
+
+export default router;
+
 
 export default router;
 Add client routes placeholder
+Connect ClientController to client routes
