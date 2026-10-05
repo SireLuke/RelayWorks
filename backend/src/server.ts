@@ -4,7 +4,18 @@ import express from "express";
 import reviewerRoutes from "./routes/reviewer";
 import express from "express";
 import workerRoutes from "./routes/worker";
+import express from "express";
+import taskRoutes from "./routes/task";
 
+const app = express();
+
+// ... existing middleware, JSON parsing, auth, etc.
+
+app.use("/task", taskRoutes);
+
+// ... existing error handlers, listen(), etc.
+
+export default app;
 const app = express();
 
 // ... existing middleware, JSON parsing, auth, etc.
