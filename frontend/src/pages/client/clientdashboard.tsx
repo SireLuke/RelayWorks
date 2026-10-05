@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { getClientDashboard } from "../../services/clientService";
+
+import Layout from "../../components/layout/Layout";
+
 import TaskList from "../../components/client/TaskList";
 import CreateTaskForm from "../../components/client/CreateTaskForm";
 import InvoicePanel from "../../components/client/InvoicePanel";
@@ -16,7 +19,7 @@ export default function ClientDashboard() {
   if (!data) return <p>Loading Client Dashboard...</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <Layout>
       <h1>Client Dashboard</h1>
 
       <section>
@@ -47,6 +50,6 @@ export default function ClientDashboard() {
       <hr />
 
       <ActivityPanel />
-    </div>
+    </Layout>
   );
 }
