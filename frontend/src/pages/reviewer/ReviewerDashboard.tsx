@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { getReviewerDashboard } from "../../services/reviewerService";
 
+import Layout from "../../components/layout/Layout";
+
 import ReviewerTaskList from "../../components/reviewer/ReviewerTaskList";
 import ReviewerApprovalPanel from "../../components/reviewer/ReviewerApprovalPanel";
 import ReviewerMessagesPanel from "../../components/reviewer/ReviewerMessagesPanel";
@@ -16,7 +18,7 @@ export default function ReviewerDashboard() {
   if (!data) return <p>Loading Reviewer Dashboard...</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <Layout>
       <h1>Reviewer Dashboard</h1>
 
       <section>
@@ -41,6 +43,6 @@ export default function ReviewerDashboard() {
       <hr />
 
       <ReviewerActivityPanel />
-    </div>
+    </Layout>
   );
 }
