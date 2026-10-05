@@ -1,148 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
-model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role
-  createdAt DateTime @default(now())
-}
-
 enum Role {
   OWNER
-  OPERATOR
-  CLIENT
-  WORKER
   REVIEWER
-}
-model Task {
-  id          String   @id @default(uuid())
-  title       String
-  description String
-  status      TaskStatus @default(PENDING)
-  clientId    String
-  operatorId  String
-  workerId    String?
-  reviewerId  String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  client      User     @relation(fields: [clientId], references: [id])
-  operator    User     @relation(fields: [operatorId], references: [id])
-  worker      User?    @relation(fields: [workerId], references: [id])
-  reviewer    User?    @relation(fields: [reviewerId], references: [id])
+  WORKER
+  OPERATOR
 }
 
 enum TaskStatus {
-  PENDING
+  UNASSIGNED
   ASSIGNED
-  SUBMITTED
-  REVIEWED
-  APPROVED
-  REJECTED
-}
-model Invoice {
-  id         String   @id @default(uuid())
-  clientId   String
-  operatorId String
-  amount     Float
-  currency   String
-  status     InvoiceStatus @default(UNPAID)
-  createdAt  DateTime @default(now())
-
-  client     User     @relation(fields: [clientId], references: [id])
-  operator   User     @relation(fields: [operatorId], references: [id])
-}
-
-enum InvoiceStatus {
+  IN_PROGRESS
+  COMPLETED
   PAID
-  UNPAID
 }
 
-model Payment {
-  id        String   @id @default(uuid())
-  invoiceId String
-  amount    Float
-  paidAt    DateTime @default(now())
-
-  invoice   Invoice  @relation(fields: [invoiceId], references: [id])
-}
-
-model Payout {
-  id         String   @id @default(uuid())
-  workerId   String
-  operatorId String
-  amount     Float
-  currency   String
-  status     PayoutStatus @default(PENDING)
-  sentAt     DateTime?
-
-  worker     User     @relation(fields: [workerId], references: [id])
-  operator   User     @relation(fields: [operatorId], references: [id])
-}
-
-enum PayoutStatus {
+enum ReviewStatus {
   PENDING
-  SENT
+  APPROVED
+  CHANGES_REQUESTED
 }
 
-model OperatorBalance {
-  id         String   @id @default(uuid())
-  operatorId String
-  balance    Float     @default(0)
-  updatedAt  DateTime  @updatedAt
-
-  operator   User      @relation(fields: [operatorId], references: [id])
-}
-
-model PlatformFee {
-  id         String   @id @default(uuid())
-  operatorId String
-  amount     Float
-  collectedAt DateTime @default(now())
-
-  operator   User     @relation(fields: [operatorId], references: [id])
-}
-model User {
+model Operator {
   id        String   @id @default(uuid())
   name      String
-  email     String   @unique
-  password  String
-  role      Role
-  skills    String[] @default([])     // worker skill tags
-  settings  Json?                     // operator settings
-  createdAt DateTime @default(now())
-}
-model Notification {
-  id        String   @id @default(uuid())
-  userId    String
-  message   String
-  type      String
-  read      Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id])
+  owners     Owner[]
+  reviewers  Reviewer[]
+  workers    Worker[]
+  tasks      Task[]
+  reviews    TaskReview[]
 }
-model ActivityLog {
-  id        String   @id @default(uuid())
-  userId    String
-  action    String
-  details   String?
-  createdAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id])
+model Owner {
+  id         String   @id @default(uuid())
+  operatorId String
+  operator   Operator @relation(fields: [operatorId], references: [id])
+
+  email      String   @unique
+  password   String
+  createdAt  DateTime @default(now())
 }
-model GlobalSettings {
-  id        String   @id @default(uuid())
-  key       String   @unique
-  value     Json
-  updatedAt DateTime @updatedAt
+
+model Reviewer {
+  id         String   @id @default(uuid())
+  operatorId String
+  operator   Operator @relation(fields: [operatorId], references: [id])
+
+  email      String   @unique
+  password   String
+  createdAt  DateTime @default(now())
+
+  reviews    TaskReview[]
+}
+
+model Worker {
+  id         String   @id @default(uuid())
+  operatorId String
+  operator   Operator @relation(fields: [operatorId], references: [id])
+
+  email      String   @unique
+  password   String
+  createdAt  DateTime @default(now())
+
+  tasks      Task[]
+}
+
+model Task {
+  id            String      @id @default(uuid())
+  operatorId    String
+  operator      Operator    @relation(fields: [operatorId], references: [id])
+
+  title         String
+  description   String
+  payoutAmount  Float
+
+  workerId      String?
+  worker        Worker?     @relation(fields: [workerId], references: [id])
+
+  status        TaskStatus  @default(UNASSIGNED)
+  completedAt   DateTime?
+
+  reviewId      String?
+  review        TaskReview? @relation(fields: [reviewId], references: [id])
+
+  createdAt     DateTime    @default(now())
+}
+
+model TaskReview {
+  id         String        @id @default(uuid())
+  operatorId String
+  operator   Operator      @relation(fields: [operatorId], references: [id])
+
+  reviewerId String
+  reviewer   Reviewer      @relation(fields: [reviewerId], references: [id])
+
+  taskId     String
+  task       Task          @relation(fields: [taskId], references: [id])
+
+  status     ReviewStatus
+  reason     String?
+
+  createdAt  DateTime      @default(now())
 }
