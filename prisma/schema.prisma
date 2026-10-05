@@ -49,3 +49,65 @@ enum TaskStatus {
   APPROVED
   REJECTED
 }
+model Invoice {
+  id         String   @id @default(uuid())
+  clientId   String
+  operatorId String
+  amount     Float
+  currency   String
+  status     InvoiceStatus @default(UNPAID)
+  createdAt  DateTime @default(now())
+
+  client     User     @relation(fields: [clientId], references: [id])
+  operator   User     @relation(fields: [operatorId], references: [id])
+}
+
+enum InvoiceStatus {
+  PAID
+  UNPAID
+}
+
+model Payment {
+  id        String   @id @default(uuid())
+  invoiceId String
+  amount    Float
+  paidAt    DateTime @default(now())
+
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id])
+}
+
+model Payout {
+  id         String   @id @default(uuid())
+  workerId   String
+  operatorId String
+  amount     Float
+  currency   String
+  status     PayoutStatus @default(PENDING)
+  sentAt     DateTime?
+
+  worker     User     @relation(fields: [workerId], references: [id])
+  operator   User     @relation(fields: [operatorId], references: [id])
+}
+
+enum PayoutStatus {
+  PENDING
+  SENT
+}
+
+model OperatorBalance {
+  id         String   @id @default(uuid())
+  operatorId String
+  balance    Float     @default(0)
+  updatedAt  DateTime  @updatedAt
+
+  operator   User      @relation(fields: [operatorId], references: [id])
+}
+
+model PlatformFee {
+  id         String   @id @default(uuid())
+  operatorId String
+  amount     Float
+  collectedAt DateTime @default(now())
+
+  operator   User     @relation(fields: [operatorId], references: [id])
+}
