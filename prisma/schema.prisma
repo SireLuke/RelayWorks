@@ -111,3 +111,13 @@ model PlatformFee {
 
   operator   User     @relation(fields: [operatorId], references: [id])
 }
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  skills    String[] @default([])     // worker skill tags
+  settings  Json?                     // operator settings
+  createdAt DateTime @default(now())
+}
