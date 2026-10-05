@@ -140,3 +140,9 @@ model ActivityLog {
 
   user      User     @relation(fields: [userId], references: [id])
 }
+model GlobalSettings {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+}
