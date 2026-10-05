@@ -2,7 +2,18 @@ import dotenv from "dotenv";
 import app from "./app";
 import express from "express";
 import reviewerRoutes from "./routes/reviewer";
+import express from "express";
+import workerRoutes from "./routes/worker";
 
+const app = express();
+
+// ... existing middleware, JSON parsing, auth, etc.
+
+app.use("/dashboard", workerRoutes);
+
+// ... existing error handlers, listen(), etc.
+
+export default app;
 const app = express();
 
 // ... existing middleware, JSON parsing, auth, etc.
