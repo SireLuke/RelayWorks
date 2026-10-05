@@ -23,3 +23,29 @@ enum Role {
   WORKER
   REVIEWER
 }
+model Task {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  status      TaskStatus @default(PENDING)
+  clientId    String
+  operatorId  String
+  workerId    String?
+  reviewerId  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  client      User     @relation(fields: [clientId], references: [id])
+  operator    User     @relation(fields: [operatorId], references: [id])
+  worker      User?    @relation(fields: [workerId], references: [id])
+  reviewer    User?    @relation(fields: [reviewerId], references: [id])
+}
+
+enum TaskStatus {
+  PENDING
+  ASSIGNED
+  SUBMITTED
+  REVIEWED
+  APPROVED
+  REJECTED
+}
