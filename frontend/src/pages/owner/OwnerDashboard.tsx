@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { getOwnerDashboard } from "../../services/ownerService";
 
+import Layout from "../../components/layout/Layout";
+
 import OwnerMetricsPanel from "../../components/owner/OwnerMetricsPanel";
 import OwnerOperatorPanel from "../../components/owner/OwnerOperatorPanel";
 import OwnerRevenuePanel from "../../components/owner/OwnerRevenuePanel";
@@ -16,7 +18,7 @@ export default function OwnerDashboard() {
   if (!data) return <p>Loading Owner Dashboard...</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <Layout>
       <h1>Owner Dashboard</h1>
 
       <OwnerMetricsPanel data={data} />
@@ -32,6 +34,6 @@ export default function OwnerDashboard() {
       <hr />
 
       <OwnerActivityPanel />
-    </div>
+    </Layout>
   );
 }
