@@ -1,5 +1,53 @@
 import { Worker } from '../models/Worker';
+import { prisma } from "../prismaClient";
 
+export async function getWorkerDashboard(operatorId: string, workerId: string) {
+  // Assigned tasks
+  const assignedTasks = await prisma.task.count({
+    where: { operatorId, workerId, status: "ASSIGNED" },
+  });
+
+  // Tasks in progress
+  const inProgressTasks = await prisma.task.count({
+    where: { operatorId, workerId, status: "IN_PROGRESS" },
+  });
+
+  // Completed tasks
+  const completedTasks = await prisma.task.count({
+    where: { operatorId, workerId, status: "COMPLETED" },
+  });
+
+  // Total payout earned
+  const totalPayout = await prisma.task.aggregate({
+    where: { operatorId, workerId, status: "COMPLETED" },
+    _sum: { payoutAmount: true },
+  });
+
+  // Tasks completed today
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const tasksCompletedToday = await prisma.task.count({
+    where: {
+      operatorId,
+      workerId,
+      status: "COMPLETED",
+      completedAt: { gte: today },
+    },
+  });
+
+  // Worker performance score
+  const workerScore = completedTasks + tasksCompletedToday;
+
+  return {
+    assignedTasks,
+    inProgressTasks,
+    completedTasks,
+    tasksCompletedToday,
+    totalPayout: totalPayout._sum.payoutAmount || 0,
+    workerScore,
+  };
+}
 export class WorkerService {
   private static workers: Worker[] = [];
 
