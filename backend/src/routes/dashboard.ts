@@ -1,0 +1,1 @@
+router.get("/owner", ownerController.getDashboard);
