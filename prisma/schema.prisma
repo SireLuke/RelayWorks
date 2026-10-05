@@ -121,3 +121,13 @@ model User {
   settings  Json?                     // operator settings
   createdAt DateTime @default(now())
 }
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  message   String
+  type      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+}
