@@ -90,7 +90,7 @@ model Task {
   completedAt   DateTime?
 
   reviewId      String?
-  review        TaskReview? @relation(fields: [reviewId], references: [id])
+  review        TaskReview? @relation("TaskToReview", fields: [reviewId], references: [id])
 
   createdAt     DateTime    @default(now())
 }
@@ -103,11 +103,12 @@ model TaskReview {
   reviewerId String
   reviewer   Reviewer      @relation(fields: [reviewerId], references: [id])
 
-  taskId     String
-  task       Task          @relation(fields: [taskId], references: [id])
+  taskId     String   @unique
+  task       Task     @relation("TaskToReview", fields: [taskId], references: [id])
 
   status     ReviewStatus
   reason     String?
 
   createdAt  DateTime      @default(now())
 }
+
