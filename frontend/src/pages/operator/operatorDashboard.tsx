@@ -7,7 +7,17 @@ import ClientPanel from "../../components/operator/ClientPanel";
 import TaskPipeline from "../../components/operator/TaskPipeline";
 import PayoutPanel from "../../components/operator/PayoutPanel";
 import NotificationsPanel from "../../components/operator/NotificationsPanel";
-import ActivityPanel from "../../components/operator/ActivityPanel";
+import ActivityPanel from "../../components/operator/ActivityPanel";import Layout from "../../components/layout/Layout";
+...
+export default function OperatorDashboard() {
+  ...
+  return (
+    <Layout>
+      <h1>Operator Dashboard</h1>
+      ...
+    </Layout>
+  );
+}
 
 export default function OperatorDashboard() {
   const [data, setData] = useState<any>(null);
