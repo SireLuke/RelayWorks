@@ -5,7 +5,8 @@ import paymentRoutes from "./modules/payments/payment.routes";
 import dashboardRoutes from "./modules/dashboard/dashboard.routes";
 import profileRoutes from "./modules/profile/profile.routes";
 import notificationRoutes from "./modules/notifications/notification.routes";
-
+import activityRoutes from "./modules/activity/activity.routes";
+app.use("/activity", activityRoutes);
 app.use("/notifications", notificationRoutes);
 app.use("/profile", profileRoutes);
 app.use("/dashboard", dashboardRoutes);
