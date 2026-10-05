@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { getWorkerDashboard } from "../../services/workerService";
 
+import Layout from "../../components/layout/Layout";
+
 import WorkerTaskList from "../../components/worker/WorkerTaskList";
 import WorkerSubmitPanel from "../../components/worker/WorkerSubmitPanel";
 import WorkerPayoutPanel from "../../components/worker/WorkerPayoutPanel";
@@ -17,7 +19,7 @@ export default function WorkerDashboard() {
   if (!data) return <p>Loading Worker Dashboard...</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <Layout>
       <h1>Worker Dashboard</h1>
 
       <section>
@@ -46,6 +48,6 @@ export default function WorkerDashboard() {
       <hr />
 
       <WorkerActivityPanel />
-    </div>
+    </Layout>
   );
 }
