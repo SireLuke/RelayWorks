@@ -6,7 +6,18 @@ import express from "express";
 import workerRoutes from "./routes/worker";
 import express from "express";
 import taskRoutes from "./routes/task";
+import express from "express";
+import paymentRoutes from "./routes/payment";
 
+const app = express();
+
+// ... existing middleware, JSON parsing, auth, etc.
+
+app.use("/payment", paymentRoutes);
+
+// ... existing error handlers, listen(), etc.
+
+export default app;
 const app = express();
 
 // ... existing middleware, JSON parsing, auth, etc.
