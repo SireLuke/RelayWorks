@@ -4,8 +4,10 @@ import taskRoutes from "./modules/tasks/task.routes";
 import paymentRoutes from "./modules/payments/payment.routes";
 import dashboardRoutes from "./modules/dashboard/dashboard.routes";
 import profileRoutes from "./modules/profile/profile.routes";
-app.use("/profile", profileRoutes);
+import notificationRoutes from "./modules/notifications/notification.routes";
 
+app.use("/notifications", notificationRoutes);
+app.use("/profile", profileRoutes);
 app.use("/dashboard", dashboardRoutes);
 app.use("/payments", paymentRoutes);
 app.use("/tasks", taskRoutes);
