@@ -15,6 +15,7 @@ import reviewerRoutes from "./routes/reviewer";
 import workerRoutes from "./routes/worker";
 import taskRoutes from "./routes/task";
 import paymentRoutes from "./routes/payment";
+import healthRoutes from "./routes/health";
 
 const app = express();
 
@@ -27,7 +28,7 @@ app.use(authMiddleware);
 app.use("/dashboard/owner", ownerRoutes);
 app.use("/dashboard", reviewerRoutes);
 app.use("/dashboard", workerRoutes);
-
+app.use("/health", healthRoutes);
 // Task lifecycle
 app.use("/task", taskRoutes);
 
