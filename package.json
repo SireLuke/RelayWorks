@@ -1,5 +1,9 @@
 {
   "scripts": {
+    "scripts": {
+  "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+  "start": "node dist/server.js"
+}
     "build": "tsc",
     "start": "node dist/server.js"
   }
