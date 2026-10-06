@@ -89,8 +89,8 @@ model Task {
   status        TaskStatus  @default(UNASSIGNED)
   completedAt   DateTime?
 
-  reviewId      String?
-  review        TaskReview? @relation("TaskToReview", fields: [reviewId], references: [id])
+  // REVIEW RELATION — Task does NOT define fields/references
+  review        TaskReview? @relation("TaskToReview")
 
   createdAt     DateTime    @default(now())
 }
@@ -103,6 +103,7 @@ model TaskReview {
   reviewerId String
   reviewer   Reviewer      @relation(fields: [reviewerId], references: [id])
 
+  // TaskReview OWNS the foreign key
   taskId     String   @unique
   task       Task     @relation("TaskToReview", fields: [taskId], references: [id])
 
@@ -111,4 +112,3 @@ model TaskReview {
 
   createdAt  DateTime      @default(now())
 }
-
