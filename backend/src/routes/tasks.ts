@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as taskController from "../controllers/taskController";
+import { requireAuth } from "../middleware/auth";
 
 const router = Router();
 
@@ -23,5 +24,5 @@ router.post("/approve", taskController.approveTask);
 
 // REVIEWER: request changes
 router.post("/changes", taskController.requestChanges);
-
+router.post("/", requireAuth, createTask);
 export default router;
