@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import taskRoutes from "./routes/task.routes";
+import authRoutes from "./routes/auth.routes";
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/tasks", taskRoutes);
+app.use("/auth", authRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
