@@ -1,15 +1,37 @@
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": false,
-    "skipLibCheck": true,
-    "outDir": "dist",
-    "resolveJsonModule": true
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
-}
+import { Router } from "express";
+import jwt from "jsonwebtoken";
+
+const router = Router();
+
+const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
+
+// TEMP USER — replace with DB later
+const fakeOwner = {
+  id: "owner-1",
+  role: "OWNER",
+  operatorId: "operator-1",
+  email: "owner@example.com",
+  password: "test123"
+};
+
+router.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  if (email !== fakeOwner.email || password !== fakeOwner.password) {
+    return res.status(401).json({ error: "Invalid credentials" });
+  }
+
+  const token = jwt.sign(
+    {
+      id: fakeOwner.id,
+      role: fakeOwner.role,
+      operatorId: fakeOwner.operatorId
+    },
+    JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  res.json({ token });
+});
+
+export default router;
