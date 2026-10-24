@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../prismaClient";
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
 
 router.post("/login", async (req, res) => {
   const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
@@ -35,7 +34,7 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign(
       { id: account.id, operatorId: account.operatorId, role: account.role },
-      JWT_SECRET,
+      process.env.JWT_SECRET || "dev-secret",
       { expiresIn: "7d" }
     );
 
