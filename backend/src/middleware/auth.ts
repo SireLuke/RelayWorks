@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
+function getJwtSecret(): string {
+  return process.env.JWT_SECRET || "dev-secret";
+}
 
 export type AppRole = "OWNER" | "REVIEWER" | "WORKER" | "OPERATOR";
 
@@ -26,7 +28,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   }
 
   try {
-    const decoded = jwt.verify(header.slice(7), JWT_SECRET) as AuthUser;
+    const decoded = jwt.verify(header.slice(7), getJwtSecret()) as AuthUser;
     if (
       !decoded ||
       typeof decoded.id !== "string" ||
