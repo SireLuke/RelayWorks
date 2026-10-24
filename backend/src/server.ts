@@ -1,33 +1,49 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { PrismaClient } from "@prisma/client";
 import taskRoutes from "./routes/task.routes";
 import authRoutes from "./routes/auth.routes";
+import { prisma } from "./prismaClient";
 
 dotenv.config();
 
-const prisma = new PrismaClient();
 const app = express();
+const allowedOrigin = process.env.FRONTEND_ORIGIN;
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: allowedOrigin || true,
+  credentials: true
+}));
+app.use(express.json({ limit: "1mb" }));
 app.use("/tasks", taskRoutes);
 app.use("/auth", authRoutes);
 
-// Health check
-app.get("/health", (req, res) => {
-  res.json({ status: "ok", time: new Date().toISOString() });
+app.get("/health", async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    return res.json({ status: "ok", database: "connected", time: new Date().toISOString() });
+  } catch {
+    return res.status(503).json({ status: "degraded", database: "unavailable", time: new Date().toISOString() });
+  }
 });
 
-// Example route
-app.get("/", (req, res) => {
-  res.send("RelayWorks backend is running");
+app.get("/", (_req, res) => {
+  res.json({ name: "RelayWorks API", status: "running", endpoints: ["/health", "/auth/login", "/tasks"] });
 });
 
-// Start server
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const PORT = Number(process.env.PORT || 3000);
+const server = app.listen(PORT, () => {
+  console.log(`RelayWorks API listening on port ${PORT}`);
 });
+
+async function shutdown(signal: string) {
+  console.log(`${signal} received; shutting down RelayWorks`);
+  server.close(async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  });
+  setTimeout(() => process.exit(1), 10000).unref();
+}
+
+process.on("SIGINT", () => void shutdown("SIGINT"));
+process.on("SIGTERM", () => void shutdown("SIGTERM"));
