@@ -17,3 +17,15 @@ export function smoothResourceAvailability(current:number,previousSmoothed:numbe
  if(!Number.isFinite(alpha)||alpha<=0||alpha>1) throw new RangeError("alpha must be in (0,1]");
  return alpha*current+(1-alpha)*previousSmoothed;
 }
+
+/**
+ * Issuance is deliberately not implemented here. A target float is an indicator,
+ * never authority to mint. Any future issuance service must separately reconcile
+ * outstanding supply, signed governance approval, limits, and an auditable ledger.
+ */
+export const PAR_ISSUANCE_POLICY = Object.freeze({
+  enabled: false,
+  requiresFreshRamsObservation: true,
+  requiresOutstandingSupplyReconciliation: true,
+  requiresExplicitAuthorization: true
+});
