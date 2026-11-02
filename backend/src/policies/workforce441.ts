@@ -25,10 +25,12 @@ export interface Workforce441Assessment {
   errors: string[];
 }
 
-const MAX_PRIMARY_HOURS = 4;
-const MAX_SECONDARY_HOURS = 4;
-const MAX_LOGISTICS_HOURS = 1;
-const MAX_TOTAL_HOURS = 9;
+export const WORKFORCE_441_POLICY = Object.freeze({ primaryHours: 4, secondaryHours: 4, logisticsHours: 1, maxTotalHours: 9, voluntary: true, mandatory: false });
+
+const MAX_PRIMARY_HOURS = WORKFORCE_441_POLICY.primaryHours;
+const MAX_SECONDARY_HOURS = WORKFORCE_441_POLICY.secondaryHours;
+const MAX_LOGISTICS_HOURS = WORKFORCE_441_POLICY.logisticsHours;
+const MAX_TOTAL_HOURS = WORKFORCE_441_POLICY.maxTotalHours;
 
 export function assessWorkforce441(plan: Workforce441Plan): Workforce441Assessment {
   const values = [plan.primaryHours, plan.secondaryHours, plan.logisticsHours];

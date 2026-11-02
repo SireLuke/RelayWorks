@@ -9,7 +9,7 @@
 5. Generate the Prisma client and apply the schema using your chosen migration workflow.
 6. Run `npm run dev`; check `GET /health` for API and database status.
 
-Never commit the real `.env` file or a production JWT secret. The built-in `dev-secret` fallback is only for local pre-alpha development; production startup requires `JWT_SECRET`.
+Never commit the real `.env` file or a production JWT secret. `JWT_SECRET` must be configured with at least 32 characters in all environments; there is no development fallback. Browser origins are allow-listed by `FRONTEND_ORIGIN` (comma-separated for multiple exact origins).
 
 ## Initial API
 
@@ -29,4 +29,4 @@ Authenticated requests use `Authorization: Bearer <token>`. Account password fie
 
 ## Pre-alpha limitations
 
-The current Prisma schema has no persistent Client, Notification, Activity, or Payout entity. The corresponding frontend panels should not be treated as wired to production-ready backend endpoints yet. No automated integration test suite is configured in this first stabilization pass; run the build and exercise the endpoints against a disposable development database before relying on them.
+A PayoutRecord records a settlement reference for reconciliation; it does not execute a transfer or prove that an external payment provider settled funds. Apply a reviewed Prisma migration before using the payout model. The corresponding frontend panels should not be treated as wired to production-ready backend endpoints yet. No automated integration test suite is configured in this first stabilization pass; run the build and exercise the endpoints against a disposable development database before relying on them.

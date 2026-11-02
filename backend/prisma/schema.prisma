@@ -38,6 +38,7 @@ model Operator {
   workers    Worker[]
   tasks      Task[]
   reviews    TaskReview[]
+  payouts    PayoutRecord[]
 }
 
 model Owner {
@@ -91,6 +92,7 @@ model Task {
 
   // REVIEW RELATION — Task does NOT define fields/references
   review        TaskReview? @relation("TaskToReview")
+  payoutRecord  PayoutRecord?
 
   createdAt     DateTime    @default(now())
 }
@@ -111,4 +113,26 @@ model TaskReview {
   reason     String?
 
   createdAt  DateTime      @default(now())
+}
+
+
+enum PayoutRecordStatus {
+  RECORDED
+  RECONCILIATION_REQUIRED
+}
+
+model PayoutRecord {
+  id                   String             @id @default(uuid())
+  operatorId           String
+  operator             Operator           @relation(fields: [operatorId], references: [id])
+  taskId               String             @unique
+  task                 Task               @relation(fields: [taskId], references: [id])
+  amount               Decimal            @db.Decimal(20, 8)
+  settlementReference  String             @unique
+  status               PayoutRecordStatus @default(RECONCILIATION_REQUIRED)
+  recordedById         String
+  note                 String?
+  createdAt            DateTime           @default(now())
+
+  @@index([operatorId, createdAt])
 }
