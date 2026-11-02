@@ -94,6 +94,41 @@ export async function updateTaskStatus(req: Request, res: Response) {
       return res.status(403).json({ error: "Only an owner or operator can mark a task paid" });
     }
 
+    if (status === "PAID") {
+      const settlementReference = typeof req.body?.settlementReference === "string"
+        ? req.body.settlementReference.trim()
+        : "";
+      if (!settlementReference) {
+        return res.status(400).json({
+          error: "settlementReference is required; this records an externally verified settlement and does not send payment"
+        });
+      }
+      try {
+        const result = await prisma.$transaction(async tx => {
+          const payout = await tx.payoutRecord.create({
+            data: {
+              operatorId: user.operatorId,
+              taskId: task.id,
+              amount: task.payoutAmount.toString(),
+              settlementReference,
+              recordedById: user.id,
+              status: "RECONCILIATION_REQUIRED",
+              note: "Manual settlement reference recorded; reconcile against external ledger/provider."
+            }
+          });
+          const updatedTask = await tx.task.update({
+            where: { id: task.id },
+            data: { status: "PAID" }
+          });
+          return { task: updatedTask, payout };
+        });
+        return res.json({ ...result, settlementRecorded: true, paymentSentByRelayWorks: false });
+      } catch (error) {
+        console.error("Payout record failed", error);
+        return res.status(409).json({ error: "Unable to record settlement; check for duplicate reference or payout record" });
+      }
+    }
+
     const updated = await prisma.task.update({
       where: { id: task.id },
       data: {
