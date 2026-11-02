@@ -30,8 +30,8 @@ export function validateRamsAvailability(input: RamsAvailabilityInput, now = new
   const observedAt = new Date(input.observedAt);
   if (!input.observedAt || !Number.isFinite(observedAt.getTime())) errors.push("observedAt must be a valid ISO date");
   else if (observedAt.getTime() > now.getTime() + 60_000) errors.push("observedAt cannot be more than 60 seconds in the future");
-  if (input.sourceVersion !== undefined && input.sourceVersion.length > 100) errors.push("sourceVersion must be at most 100 chars");
-  if (input.notes !== undefined && input.notes.length > 1000) errors.push("notes must be at most 1000 chars");
+  if (input.sourceVersion !== undefined && (typeof input.sourceVersion !== "string" || input.sourceVersion.length > 100)) errors.push("sourceVersion must be a string of at most 100 chars");
+  if (input.notes !== undefined && (typeof input.notes !== "string" || input.notes.length > 1000)) errors.push("notes must be a string of at most 1000 chars");
   return { valid: errors.length === 0, errors, observedAt };
 }
 
