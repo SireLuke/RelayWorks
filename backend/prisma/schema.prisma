@@ -39,6 +39,7 @@ model Operator {
   tasks      Task[]
   reviews    TaskReview[]
   payouts    PayoutRecord[]
+  resourceAvailabilityObservations ResourceAvailabilityObservation[]
 }
 
 model Owner {
@@ -135,4 +136,26 @@ model PayoutRecord {
   createdAt            DateTime           @default(now())
 
   @@index([operatorId, createdAt])
+}
+
+
+// RAMS observations are provenance-bearing inputs, not issuance authorizations.
+model ResourceAvailabilityObservation {
+  id                    String   @id @default(uuid())
+  operatorId             String
+  operator               Operator @relation(fields: [operatorId], references: [id])
+  sourceSystem           String
+  sourceRecordId         String
+  sourceVersion          String?
+  rawAvailability        Float
+  smoothedAvailability   Float
+  smoothingAlpha         Float
+  observedAt             DateTime
+  receivedAt             DateTime @default(now())
+  submittedById          String
+  payloadHash            String
+  notes                  String?
+
+  @@unique([sourceSystem, sourceRecordId])
+  @@index([operatorId, observedAt])
 }
