@@ -6,7 +6,7 @@ import ramsRoutes from "./routes/rams.routes";
 import authRoutes from "./routes/auth.routes";
 import { prisma } from "./prismaClient";
 import { WORKFORCE_441_POLICY } from "./policies/workforce441";
-import { PAR_POLICY } from "./policy/par";
+import { PAR_POLICY, PAR_ISSUANCE_POLICY } from "./policy/par";
 import { RAMS_POLICY } from "./policy/rams";
 
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
@@ -32,7 +32,7 @@ app.use("/tasks", taskRoutes);
 app.use("/rams", ramsRoutes);
 app.use("/auth", authRoutes);
 
-app.get("/policy", (_req, res) => res.json({ workforce441: WORKFORCE_441_POLICY, par: PAR_POLICY, rams: RAMS_POLICY, status: "policy defaults only; no live PAR/RAMS ledger integration" }));
+app.get("/policy", (_req, res) => res.json({ workforce441: WORKFORCE_441_POLICY, par: PAR_POLICY, parIssuance: PAR_ISSUANCE_POLICY, rams: RAMS_POLICY, status: "policy defaults only; no live PAR/RAMS ledger integration" }));
 
 app.get("/health", async (_req, res) => {
   try {
@@ -47,7 +47,7 @@ app.get("/", (_req, res) => {
   return res.json({
     name: "RelayWorks API",
     status: "running",
-    endpoints: ["/health", "/policy", "/auth/login", "/tasks", "/rams/resource-availability", "/rams/resource-availability/current"]
+    endpoints: ["/health", "/policy", "/auth/login", "/tasks", "/rams/resource-availability", "/rams/resource-availability/current", "/rams/candidate-target-float?population=1000"]
   });
 });
 
