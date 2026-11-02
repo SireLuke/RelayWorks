@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import { prisma } from "../prismaClient";
 import { calculateTargetFloat, smoothResourceAvailability } from "./par";
 
+export const RAMS_POLICY = Object.freeze({ normalizedRange: [0, 1] as const, defaultSmoothingAlpha: 0.25, defaultMaxAgeMinutes: 60, futureClockToleranceSeconds: 60, issuanceAuthorizedByAvailability: false });
+
 export interface RamsAvailabilityInput {
   sourceSystem: string;
   sourceRecordId: string;
@@ -12,8 +14,8 @@ export interface RamsAvailabilityInput {
 }
 
 export function ramsConfig(now = new Date()) {
-  const alpha = Number(process.env.RAMS_SMOOTHING_ALPHA ?? "0.25"); // provisional pilot default; configure explicitly before production
-  const maxAgeMinutes = Number(process.env.RAMS_MAX_AGE_MINUTES ?? "60");
+  const alpha = Number(process.env.RAMS_SMOOTHING_ALPHA ?? String(RAMS_POLICY.defaultSmoothingAlpha)); // provisional pilot default; configure explicitly before production
+  const maxAgeMinutes = Number(process.env.RAMS_MAX_AGE_MINUTES ?? String(RAMS_POLICY.defaultMaxAgeMinutes));
   if (!Number.isFinite(alpha) || alpha <= 0 || alpha > 1) throw new Error("RAMS_SMOOTHING_ALPHA must be in (0,1]");
   if (!Number.isFinite(maxAgeMinutes) || maxAgeMinutes <= 0) throw new Error("RAMS_MAX_AGE_MINUTES must be positive");
   return { alpha, maxAgeMinutes, now };
@@ -21,8 +23,9 @@ export function ramsConfig(now = new Date()) {
 
 export function validateRamsAvailability(input: RamsAvailabilityInput, now = new Date()) {
   const errors: string[] = [];
-  if (!input.sourceSystem?.trim() || input.sourceSystem.trim().length > 100) errors.push("sourceSystem is required (max 100 chars)");
-  if (!input.sourceRecordId?.trim() || input.sourceRecordId.trim().length > 200) errors.push("sourceRecordId is required (max 200 chars)");
+  if (!input || typeof input !== "object") return { valid: false, errors: ["A RAMS observation object is required"], observedAt: new Date(NaN) };
+  if (typeof input.sourceSystem !== "string" || !input.sourceSystem.trim() || input.sourceSystem.trim().length > 100) errors.push("sourceSystem is required (max 100 chars)");
+  if (typeof input.sourceRecordId !== "string" || !input.sourceRecordId.trim() || input.sourceRecordId.trim().length > 200) errors.push("sourceRecordId is required (max 200 chars)");
   if (!Number.isFinite(input.availability) || input.availability < 0 || input.availability > 1) errors.push("availability must be normalized to [0,1]");
   const observedAt = new Date(input.observedAt);
   if (!input.observedAt || !Number.isFinite(observedAt.getTime())) errors.push("observedAt must be a valid ISO date");
