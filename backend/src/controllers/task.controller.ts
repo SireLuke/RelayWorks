@@ -100,7 +100,7 @@ export async function updateTaskStatus(req: Request, res: Response) {
         : "";
       if (!settlementReference) {
         return res.status(400).json({
-          error: "settlementReference is required; this records an externally verified settlement and does not send payment"
+          error: "settlementReference is required; this records a claimed external settlement for reconciliation and does not verify or send payment"
         });
       }
       try {
