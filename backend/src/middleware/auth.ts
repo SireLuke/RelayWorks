@@ -32,7 +32,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   }
 
   try {
-    const decoded = jwt.verify(header.slice(7), getJwtSecret()) as Partial<AuthUser>;
+    const decoded = jwt.verify(header.slice(7), getJwtSecret(), { issuer: "relayworks", audience: "relayworks-api" }) as Partial<AuthUser>;
     if (
       !decoded ||
       typeof decoded.id !== "string" ||
