@@ -38,6 +38,7 @@ model Operator {
   workers    Worker[]
   tasks      Task[]
   reviews    TaskReview[]
+  payouts    PayoutRecord[]
 }
 
 model Owner {
@@ -123,6 +124,7 @@ enum PayoutRecordStatus {
 model PayoutRecord {
   id                   String             @id @default(uuid())
   operatorId           String
+  operator             Operator           @relation(fields: [operatorId], references: [id])
   taskId               String             @unique
   task                 Task               @relation(fields: [taskId], references: [id])
   amount               Decimal            @db.Decimal(20, 8)
