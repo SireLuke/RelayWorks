@@ -13,6 +13,7 @@ test("RAMS rejects missing, out-of-range, future and malformed observations",()=
  assert.equal(rams.validateRamsAvailability({sourceSystem:"demo",sourceRecordId:"1",availability:1.1,observedAt:new Date().toISOString()}).valid,false);
  assert.equal(rams.validateRamsAvailability({sourceSystem:"demo",sourceRecordId:"2",availability:0.5,observedAt:"not-a-date"}).valid,false);
  assert.equal(rams.validateRamsAvailability({sourceSystem:"demo",sourceRecordId:"3",availability:0.5,observedAt:new Date(Date.now()+120000).toISOString()}).valid,false);
+ assert.equal(rams.validateRamsAvailability({sourceSystem:"demo",sourceRecordId:"4",availability:0.5,observedAt:new Date().toISOString(),sourceVersion:42}).valid,false);
 });
 test("RAMS payload hash is deterministic and sensitive to content",()=>{
  const base={sourceSystem:"fixture",sourceRecordId:"rec-1",availability:0.5,observedAt:"2026-11-02T12:00:00.000Z"};
