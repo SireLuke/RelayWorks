@@ -7,8 +7,8 @@ import { prisma } from "./prismaClient";
 import { WORKFORCE_441_POLICY } from "./policies/workforce441";
 import { PAR_POLICY } from "./policy/par";
 
-if (process.env.NODE_ENV === "production" && !process.env.JWT_SECRET) {
-  throw new Error("JWT_SECRET must be configured in production");
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+  throw new Error("JWT_SECRET must be configured and contain at least 32 characters");
 }
 
 const app = express();
