@@ -112,3 +112,23 @@ model TaskReview {
 
   createdAt  DateTime      @default(now())
 }
+
+
+enum PayoutRecordStatus {
+  RECORDED
+  RECONCILIATION_REQUIRED
+}
+
+model PayoutRecord {
+  id                   String             @id @default(uuid())
+  operatorId           String
+  taskId               String             @unique
+  amount               Decimal            @db.Decimal(20, 8)
+  settlementReference  String             @unique
+  status               PayoutRecordStatus @default(RECONCILIATION_REQUIRED)
+  recordedById         String
+  note                 String?
+  createdAt            DateTime           @default(now())
+
+  @@index([operatorId, createdAt])
+}
