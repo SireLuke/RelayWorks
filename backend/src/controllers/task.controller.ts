@@ -84,17 +84,24 @@ export async function updateTaskStatus(req: Request, res: Response) {
       UNASSIGNED: ["ASSIGNED"],
       ASSIGNED: ["IN_PROGRESS"],
       IN_PROGRESS: ["COMPLETED"],
-      COMPLETED: ["PAID"],
+      COMPLETED: ["PAYOUT_PENDING"],
+      PAYOUT_PENDING: [],
       PAID: []
     };
     if (!allowed[task.status].includes(status as TaskStatus)) {
       return res.status(409).json({ error: `Invalid status transition: ${task.status} -> ${status}` });
     }
+    if (status === "PAID") {
+      return res.status(409).json({ error: "RelayWorks has no verified payment-provider adapter configured; a task cannot be marked PAID from a user-supplied reference. Record a payout claim as PAYOUT_PENDING for reconciliation instead." });
+    }
+    if (status === "PAYOUT_PENDING" && !privileged) {
+      return res.status(403).json({ error: "Only an owner or operator can record a payout claim" });
+    }
     if (status === "PAID" && !privileged) {
       return res.status(403).json({ error: "Only an owner or operator can mark a task paid" });
     }
 
-    if (status === "PAID") {
+    if (status === "PAYOUT_PENDING") {
       const settlementReference = typeof req.body?.settlementReference === "string"
         ? req.body.settlementReference.trim()
         : "";
@@ -118,11 +125,11 @@ export async function updateTaskStatus(req: Request, res: Response) {
           });
           const updatedTask = await tx.task.update({
             where: { id: task.id },
-            data: { status: "PAID" }
+            data: { status: "PAYOUT_PENDING" }
           });
           return { task: updatedTask, payout };
         });
-        return res.json({ ...result, settlementRecorded: true, paymentSentByRelayWorks: false });
+        return res.json({ ...result, settlementRecorded: true, paymentSentByRelayWorks: false, taskStatus: "PAYOUT_PENDING" });
       } catch (error) {
         console.error("Payout record failed", error);
         return res.status(409).json({ error: "Unable to record settlement; check for duplicate reference or payout record" });
