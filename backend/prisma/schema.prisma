@@ -91,6 +91,7 @@ model Task {
 
   // REVIEW RELATION — Task does NOT define fields/references
   review        TaskReview? @relation("TaskToReview")
+  payoutRecord  PayoutRecord?
 
   createdAt     DateTime    @default(now())
 }
@@ -123,6 +124,7 @@ model PayoutRecord {
   id                   String             @id @default(uuid())
   operatorId           String
   taskId               String             @unique
+  task                 Task               @relation(fields: [taskId], references: [id])
   amount               Decimal            @db.Decimal(20, 8)
   settlementReference  String             @unique
   status               PayoutRecordStatus @default(RECONCILIATION_REQUIRED)
