@@ -19,6 +19,7 @@ enum TaskStatus {
   ASSIGNED
   IN_PROGRESS
   COMPLETED
+  PAYOUT_PENDING
   PAID
 }
 
