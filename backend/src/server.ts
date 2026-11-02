@@ -10,10 +10,17 @@ if (process.env.NODE_ENV === "production" && !process.env.JWT_SECRET) {
 }
 
 const app = express();
-const allowedOrigin = process.env.FRONTEND_ORIGIN;
+const allowedOrigins = (process.env.FRONTEND_ORIGIN || "")
+  .split(",")
+  .map(value => value.trim())
+  .filter(Boolean);
 
 app.use(cors({
-  origin: allowedOrigin || true,
+  origin(origin, callback) {
+    // Non-browser clients may omit Origin. Browser origins must be explicitly allow-listed.
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Origin not allowed by RelayWorks CORS policy"));
+  },
   credentials: true
 }));
 app.use(express.json({ limit: "1mb" }));
