@@ -4,6 +4,8 @@ import cors from "cors";
 import taskRoutes from "./routes/task.routes";
 import authRoutes from "./routes/auth.routes";
 import { prisma } from "./prismaClient";
+import { WORKFORCE_441_POLICY } from "./policies/workforce441";
+import { PAR_POLICY } from "./policy/par";
 
 if (process.env.NODE_ENV === "production" && !process.env.JWT_SECRET) {
   throw new Error("JWT_SECRET must be configured in production");
@@ -27,6 +29,8 @@ app.use(express.json({ limit: "1mb" }));
 app.use("/tasks", taskRoutes);
 app.use("/auth", authRoutes);
 
+app.get("/policy", (_req, res) => res.json({ workforce441: WORKFORCE_441_POLICY, par: PAR_POLICY, status: "policy defaults only; no live PAR/RAMS ledger integration" }));
+
 app.get("/health", async (_req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
@@ -40,7 +44,7 @@ app.get("/", (_req, res) => {
   return res.json({
     name: "RelayWorks API",
     status: "running",
-    endpoints: ["/health", "/auth/login", "/tasks"]
+    endpoints: ["/health", "/policy", "/auth/login", "/tasks"]
   });
 });
 
