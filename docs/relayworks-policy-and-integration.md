@@ -21,7 +21,7 @@ Policy contract and utility functions only. RelayWorks does not yet integrate wi
 - Target float is a soft peg. Target changes do not mint currency. Keep target float, outstanding supply, and issuance authorization separate.
 
 ## Payment safety
-Task status PAID must not be treated as proof of settlement. Before real payment flows, introduce an immutable payout/ledger record, provider reference, idempotency key, reconciliation, and role/tenant authorization. There is no payment-provider integration yet.
+Task status PAID must not be treated as proof of settlement. Before real payment flows, introduce an immutable payout/ledger record, provider reference, idempotency key, reconciliation, and role/tenant authorization. There is no payment-provider integration yet. The settlement reference is user-supplied and is not independently verified by RelayWorks; the payout remains flagged for reconciliation. The initial Prisma migration creates the full pre-alpha schema for a fresh database. For an existing database, inspect and baseline migration history rather than applying this initial migration blindly.
 
 ## Engineering invariants
 - Task access is scoped by operatorId; worker access is additionally scoped by workerId.
