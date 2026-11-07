@@ -5,6 +5,14 @@ import { prisma } from "../prismaClient";
 
 const router = Router();
 
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret.length < 32) {
+    throw new Error("JWT_SECRET must be configured and contain at least 32 characters");
+  }
+  return secret;
+}
+
 router.post("/login", async (req, res) => {
   const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
   const password = typeof req.body?.password === "string" ? req.body.password : "";
@@ -34,8 +42,8 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign(
       { id: account.id, operatorId: account.operatorId, role: account.role },
-      process.env.JWT_SECRET || "dev-secret",
-      { expiresIn: "7d" }
+      getJwtSecret(),
+      { expiresIn: "7d", issuer: "relayworks", audience: "relayworks-api" }
     );
 
     return res.json({

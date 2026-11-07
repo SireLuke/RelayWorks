@@ -19,6 +19,7 @@ enum TaskStatus {
   ASSIGNED
   IN_PROGRESS
   COMPLETED
+  PAYOUT_PENDING
   PAID
 }
 
@@ -38,6 +39,8 @@ model Operator {
   workers    Worker[]
   tasks      Task[]
   reviews    TaskReview[]
+  payouts    PayoutRecord[]
+  resourceAvailabilityObservations ResourceAvailabilityObservation[]
 }
 
 model Owner {
@@ -91,6 +94,7 @@ model Task {
 
   // REVIEW RELATION — Task does NOT define fields/references
   review        TaskReview? @relation("TaskToReview")
+  payoutRecord  PayoutRecord?
 
   createdAt     DateTime    @default(now())
 }
@@ -111,4 +115,48 @@ model TaskReview {
   reason     String?
 
   createdAt  DateTime      @default(now())
+}
+
+
+enum PayoutRecordStatus {
+  RECORDED
+  RECONCILIATION_REQUIRED
+}
+
+model PayoutRecord {
+  id                   String             @id @default(uuid())
+  operatorId           String
+  operator             Operator           @relation(fields: [operatorId], references: [id])
+  taskId               String             @unique
+  task                 Task               @relation(fields: [taskId], references: [id])
+  amount               Decimal            @db.Decimal(20, 8)
+  settlementReference  String             @unique
+  status               PayoutRecordStatus @default(RECONCILIATION_REQUIRED)
+  recordedById         String
+  note                 String?
+  createdAt            DateTime           @default(now())
+
+  @@index([operatorId, createdAt])
+}
+
+
+// RAMS observations are provenance-bearing inputs, not issuance authorizations.
+model ResourceAvailabilityObservation {
+  id                    String   @id @default(uuid())
+  operatorId             String
+  operator               Operator @relation(fields: [operatorId], references: [id])
+  sourceSystem           String
+  sourceRecordId         String
+  sourceVersion          String?
+  rawAvailability        Float
+  smoothedAvailability   Float
+  smoothingAlpha         Float
+  observedAt             DateTime
+  receivedAt             DateTime @default(now())
+  submittedById          String
+  payloadHash            String
+  notes                  String?
+
+  @@unique([sourceSystem, sourceRecordId])
+  @@index([operatorId, observedAt])
 }

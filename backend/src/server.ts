@@ -2,23 +2,37 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import taskRoutes from "./routes/task.routes";
+import ramsRoutes from "./routes/rams.routes";
 import authRoutes from "./routes/auth.routes";
 import { prisma } from "./prismaClient";
+import { WORKFORCE_441_POLICY } from "./policies/workforce441";
+import { PAR_POLICY, PAR_ISSUANCE_POLICY } from "./policy/par";
+import { RAMS_POLICY } from "./policy/rams";
 
-if (process.env.NODE_ENV === "production" && !process.env.JWT_SECRET) {
-  throw new Error("JWT_SECRET must be configured in production");
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+  throw new Error("JWT_SECRET must be configured and contain at least 32 characters");
 }
 
 const app = express();
-const allowedOrigin = process.env.FRONTEND_ORIGIN;
+const allowedOrigins = (process.env.FRONTEND_ORIGIN || "")
+  .split(",")
+  .map(value => value.trim())
+  .filter(Boolean);
 
 app.use(cors({
-  origin: allowedOrigin || true,
+  origin(origin, callback) {
+    // Non-browser clients may omit Origin. Browser origins must be explicitly allow-listed.
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Origin not allowed by RelayWorks CORS policy"));
+  },
   credentials: true
 }));
 app.use(express.json({ limit: "1mb" }));
 app.use("/tasks", taskRoutes);
+app.use("/rams", ramsRoutes);
 app.use("/auth", authRoutes);
+
+app.get("/policy", (_req, res) => res.json({ workforce441: WORKFORCE_441_POLICY, par: PAR_POLICY, parIssuance: PAR_ISSUANCE_POLICY, rams: RAMS_POLICY, status: "policy defaults only; no live PAR/RAMS ledger integration" }));
 
 app.get("/health", async (_req, res) => {
   try {
@@ -33,7 +47,7 @@ app.get("/", (_req, res) => {
   return res.json({
     name: "RelayWorks API",
     status: "running",
-    endpoints: ["/health", "/auth/login", "/tasks"]
+    endpoints: ["/health", "/policy", "/auth/login", "/tasks", "/rams/resource-availability", "/rams/resource-availability/current", "/rams/candidate-target-float?population=1000"]
   });
 });
 
